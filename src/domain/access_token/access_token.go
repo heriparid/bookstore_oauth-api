@@ -1,6 +1,11 @@
 package access_token
 
-import "time"
+import (
+	"strings"
+	"time"
+
+	"github.com/heriparid/oauth-api/src/utils/errors"
+)
 
 const (
 	expirationTime = 24
@@ -12,6 +17,28 @@ type AccessToken struct {
 	UserID       int64  `json:"user_id"`
 	ClientID     int64  `json:"client_id"`
 	Expires      int64  `json:"expires"`
+}
+
+// Validate value
+func (at *AccessToken) Validate() *errors.RestErr {
+	at.AcccessToken = strings.TrimSpace(at.AcccessToken)
+	if at.AcccessToken == "" {
+		return errors.NewBadRequestError("invalid access token")
+	}
+
+	if at.UserID <= 0 {
+		return errors.NewBadRequestError("invalid user ID")
+	}
+
+	if at.ClientID <= 0 {
+		return errors.NewBadRequestError("invalid client ID")
+	}
+
+	if at.Expires <= 0 {
+		return errors.NewBadRequestError("invalid expiry time")
+	}
+
+	return nil
 }
 
 // GetNewAccessToken for creating new instance

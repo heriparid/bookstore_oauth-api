@@ -5,11 +5,15 @@ import "github.com/heriparid/oauth-api/src/utils/errors"
 // Repository service
 type Repository interface {
 	GetByID(string) (*AccessToken, *errors.RestErr)
+	Create(AccessToken) *errors.RestErr
+	UpdateExpiryTime(AccessToken) *errors.RestErr
 }
 
 // Service interface
 type Service interface {
 	GetByID(string) (*AccessToken, *errors.RestErr)
+	Create(AccessToken) *errors.RestErr
+	UpdateExpiryTime(AccessToken) *errors.RestErr
 }
 
 type service struct {
@@ -30,4 +34,20 @@ func (s *service) GetByID(accessTokenID string) (*AccessToken, *errors.RestErr) 
 		return nil, err
 	}
 	return at, nil
+}
+
+func (s *service) Create(at AccessToken) *errors.RestErr {
+	if err := at.Validate(); err != nil {
+		return err
+	}
+
+	return s.repository.Create(at)
+}
+
+func (s *service) UpdateExpiryTime(at AccessToken) *errors.RestErr {
+	if err := at.Validate(); err != nil {
+		return err
+	}
+
+	return s.repository.UpdateExpiryTime(at)
 }
