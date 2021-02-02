@@ -28,14 +28,8 @@ func NewRepository() DbRepository {
 }
 
 func (r *dbRepository) GetByID(accessTokenID string) (*access_token.AccessToken, *errors.RestErr) {
-	session, err := cassandra.GetSession()
-	if err != nil {
-		return nil, errors.NewInternalServerError(err.Error())
-	}
-	defer session.Close()
-
 	var result access_token.AccessToken
-	if err := session.Query(queryGetAccessToken, accessTokenID).Scan(
+	if err := cassandra.GetSession().Query(queryGetAccessToken, accessTokenID).Scan(
 		&result.AcccessToken,
 		&result.UserID,
 		&result.ClientID,
@@ -50,13 +44,7 @@ func (r *dbRepository) GetByID(accessTokenID string) (*access_token.AccessToken,
 }
 
 func (r *dbRepository) Create(at access_token.AccessToken) *errors.RestErr {
-	session, err := cassandra.GetSession()
-	if err != nil {
-		return errors.NewInternalServerError(err.Error())
-	}
-	defer session.Close()
-
-	if err := session.Query(queryCreateAccessToken,
+	if err := cassandra.GetSession().Query(queryCreateAccessToken,
 		at.AcccessToken,
 		at.UserID,
 		at.ClientID,
@@ -68,13 +56,7 @@ func (r *dbRepository) Create(at access_token.AccessToken) *errors.RestErr {
 }
 
 func (r *dbRepository) UpdateExpiryTime(at access_token.AccessToken) *errors.RestErr {
-	session, err := cassandra.GetSession()
-	if err != nil {
-		return errors.NewInternalServerError(err.Error())
-	}
-	defer session.Close()
-
-	if err := session.Query(queryUpdateExpiryTime,
+	if err := cassandra.GetSession().Query(queryUpdateExpiryTime,
 		at.Expires,
 		at.AcccessToken,
 	).Exec(); err != nil {
